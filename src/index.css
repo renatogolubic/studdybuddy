@@ -809,6 +809,40 @@ a { color: inherit; }
 .subject-ost  { background: linear-gradient(90deg, #9CA3AF, #D1D5DB); }
 
 /* ══════════════════════════════════════════
+   LIGHT THEME OVERRIDES
+══════════════════════════════════════════ */
+[data-theme="studybuddy"][data-light="true"] .sb-navbar {
+  border-bottom-color: var(--border3);
+}
+[data-theme="studybuddy"][data-light="true"] .card-sb,
+[data-theme="studybuddy"][data-light="true"] .card-note {
+  background: var(--card-bg-val, rgba(255,255,255,0.7));
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+[data-theme="studybuddy"][data-light="true"] .card-sb:hover,
+[data-theme="studybuddy"][data-light="true"] .card-note:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 0 0 1px var(--accent-dim);
+}
+[data-theme="studybuddy"][data-light="true"] .form-input {
+  background: rgba(255,255,255,0.9);
+  color: var(--text);
+}
+[data-theme="studybuddy"][data-light="true"] ::-webkit-scrollbar-thumb {
+  background: var(--surface3);
+}
+[data-theme="studybuddy"][data-light="true"] .mobile-menu {
+  background: rgba(242,244,243,0.96);
+}
+[data-theme="studybuddy"][data-light="true"] .bottom-nav {
+  background: rgba(242,244,243,0.94);
+  border-top-color: var(--border3);
+}
+[data-theme="studybuddy"][data-light="true"] .toast-item {
+  background: rgba(255,255,255,0.97);
+  color: var(--text);
+}
+
+/* ══════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════ */
 @media (max-width: 640px) {

@@ -2,6 +2,7 @@ import { Router, Route, Navigate, useLocation } from "@solidjs/router";
 import { isAuthenticated, authLoading, isAdmin } from "./services/auth.js";
 import { Show, createSignal, createEffect } from "solid-js";
 import Toast from "./components/Toast.jsx";
+import ThemeSelector from "./components/ThemeSelector.jsx";
 import Home          from "./pages/Home.jsx";
 import SignIn        from "./pages/SignIn.jsx";
 import SignUp        from "./pages/SignUp.jsx";
@@ -108,13 +109,20 @@ function Layout(props) {
             <a href="/user/signout" class="btn-sb" title="Odjava" style="color:var(--error);">
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             </a>
-            <a href="/notes/create" class="btn-primary" style="margin-left:0.5rem;">
+          </Show>
+          <Show when={!isAuthenticated()}>
+            <a href="/user/signin" class="btn-ghost">Prijava</a>
+          </Show>
+          {/* Theme selector — always visible in navbar */}
+          <div style="width:1px;height:20px;background:var(--border2);margin:0 0.25rem;" />
+          <ThemeSelector />
+          <Show when={isAuthenticated()}>
+            <a href="/notes/create" class="btn-primary" style="margin-left:0.25rem;">
               <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Nova bilješka
             </a>
           </Show>
           <Show when={!isAuthenticated()}>
-            <a href="/user/signin" class="btn-ghost">Prijava</a>
             <a href="/user/signup" class="btn-primary">Registracija</a>
           </Show>
         </div>

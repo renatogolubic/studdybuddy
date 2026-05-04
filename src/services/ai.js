@@ -3,7 +3,7 @@
 
 const GROQ_TOKEN = import.meta.env.VITE_GROQ_TOKEN;
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-const GROQ_MODEL = "llama-3.1-8b-instant"; // fast, free, great for structured output
+const GROQ_MODEL = "llama-3.1-8b-instant";
 
 /**
  * Generate flashcards (Q&A pairs) from note content using Groq's free API.
