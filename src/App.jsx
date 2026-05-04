@@ -14,6 +14,8 @@ import NoteDetail    from "./pages/NoteDetail.jsx";
 import MyNotes       from "./pages/MyNotes.jsx";
 import SearchNotes   from "./pages/SearchNotes.jsx";
 import AllNotes      from "./pages/AllNotes.jsx";
+import Flashcards    from "./pages/Flashcards.jsx";
+import Leaderboard   from "./pages/Leaderboard.jsx";
 
 export default function App() {
   return (
@@ -28,6 +30,8 @@ export default function App() {
           <Route path="/resetpassword" component={ResetPassword} />
         </Route>
         <Route path="/notes/:id" component={NoteDetail} />
+        <Route path="/notes/:id/flashcards" component={Flashcards} />
+        <Route path="/leaderboard" component={Leaderboard} />
         <Route path="/profile" component={AuthBoundary}>
           <Route path="/" component={UserProfile} />
         </Route>
@@ -78,6 +82,10 @@ function Layout(props) {
 
         {/* Desktop links */}
         <div class="sb-nav-links sb-nav-desktop">
+          <a href="/leaderboard" class={`btn-sb${isActive("/leaderboard") ? " nav-active" : ""}`}>
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            Rang-lista
+          </a>
           <a href="/notes/search" class={`btn-sb${isActive("/notes/search") ? " nav-active" : ""}`}>
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             Pretraga
@@ -90,7 +98,7 @@ function Layout(props) {
             <Show when={isAdmin()}>
               <a href="/notes/all" class={`btn-sb${isActive("/notes/all") ? " nav-active" : ""}`} style="color:var(--warning);">
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                Admin
+                Admin Panel
               </a>
             </Show>
             <a href="/profile" class={`btn-sb${isActive("/profile") ? " nav-active" : ""}`}>
@@ -139,6 +147,10 @@ function Layout(props) {
           <a href="/notes/search" class="mobile-menu-item">
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             Pretraga bilješki
+          </a>
+          <a href="/leaderboard" class="mobile-menu-item">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            Rang-lista
           </a>
           <Show when={isAuthenticated()}>
             <a href="/notes/my" class="mobile-menu-item">
@@ -192,6 +204,10 @@ function Layout(props) {
           <a href="/notes/search" class={`bottom-nav-item${isActive("/notes/search") ? " active" : ""}`}>
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <span>Pretraga</span>
+          </a>
+          <a href="/leaderboard" class={`bottom-nav-item${isActive("/leaderboard") ? " active" : ""}`}>
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span>Rang</span>
           </a>
           <a href="/notes/create" class="bottom-nav-item bottom-nav-create">
             <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>

@@ -8,9 +8,11 @@ import {
   onAuthStateChanged,
   updateProfile,
   sendPasswordResetEmail,
-  sendEmailVerification
+  sendEmailVerification,
+  signInWithPopup
 } from "firebase/auth";
 import { getUserProfile, createUserProfile } from "./db";
+import { googleProvider, githubProvider } from "../lib/firebase";
 
 // global state
 export const [currentUser, setCurrentUser] = createSignal(null);
@@ -58,6 +60,36 @@ export const authService = {
       const userCred = await signInWithEmailAndPassword(auth, email, password);
       return userCred.user;
     } catch (error) {
+      throw getErrorMessage(error);
+    }
+  },
+
+  async signInWithGoogle() {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      const profile = await getUserProfile(user.uid);
+      if (!profile) {
+        await createUserProfile(user);
+      }
+      return user;
+    } catch (error) {
+      console.error("Greška pri Google prijavi:", error);
+      throw getErrorMessage(error);
+    }
+  },
+
+  async signInWithGithub() {
+    try {
+      const result = await signInWithPopup(auth, githubProvider);
+      const user = result.user;
+      const profile = await getUserProfile(user.uid);
+      if (!profile) {
+        await createUserProfile(user);
+      }
+      return user;
+    } catch (error) {
+      console.error("Greška pri GitHub prijavi:", error);
       throw getErrorMessage(error);
     }
   },

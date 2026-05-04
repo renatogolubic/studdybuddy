@@ -56,11 +56,12 @@ U hrvatskom obrazovnom sustavu nedostaje jednostavna, besplatna i lokalizirana p
 
 | Funkcionalnost | Status |
 |---|---|
-| Komentari na bilješkama | ⏳ Nije napravljeno |
-| Ocjenjivanje bilješki (1–5 zvjezdica) | ⏳ Nije napravljeno |
-| Flashcards mod za učenje | ⏳ Nije napravljeno |
-| Sustav bodova i rang-lista | ⏳ Nije napravljeno |
-| Google prijava | ⏳ Nije napravljeno |
+| Komentari na bilješkama | ✅ Napravljeno |
+| Ocjenjivanje bilješki (1–5 zvjezdica) | ✅ Napravljeno |
+| Flashcards mod za učenje | ✅ Napravljeno |
+| Sustav bodova i rang-lista | ✅ Napravljeno |
+| Google prijava | ✅ Napravljeno |
+| Github prijava | ✅ Napravljeno |
 
 ---
 
@@ -109,9 +110,16 @@ Korisnik ode na Profil → klikne „Promijeni lozinku" → unese trenutnu i nov
   isPublic:    boolean,      // javna ili privatna
   tags:        string[],     // ključne riječi
   favorites:   string[],     // UID-ovi korisnika koji su favorizirali
+  ratingSum:   number,       // ukupna suma ocjena
+  ratingCount: number,       // broj ocjena
   createdAt:   Timestamp,
   updatedAt:   Timestamp
 }
+
+#### Subkolekcije unutar `notes/{noteId}`:
+- **`comments`**: `{ userId, userName, text, createdAt }`
+- **`ratings`**: `{ userId, value }`
+- **`flashcards`**: `{ question, answer, order }`
 ```
 
 ---
@@ -131,9 +139,9 @@ Korisnik ode na Profil → klikne „Promijeni lozinku" → unese trenutnu i nov
 
 ---
 
-## Vizualni prototip
+## Vizualni prikaz
 
-![StudyBuddy Prototip](/img/image1.jpg)
+![StudyBuddy Prototip](/img/image1.png)
 
 ---
 
@@ -158,7 +166,10 @@ Korisnik ode na Profil → klikne „Promijeni lozinku" → unese trenutnu i nov
 - Responzivan dizajn (desktop + mobilni uređaji)
 - Objavljena aplikacija na Firebase Hostingu
 
-### ⏳ Faza 3 — Implementacija (u tijeku)
+### ✅ Faza 3 — Implementacija naprednih mogućnosti (završena)
 - Uređivanje postojećih bilješki
 - Komentari i ocjenjivanje
 - Flashcards mod
+- Sustav bodova i rang-lista
+- Prijava putem Googlea
+- Prijava putem Github-a

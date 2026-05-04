@@ -615,6 +615,26 @@ a { color: inherit; }
   animation: blobFloat 8s ease-in-out infinite;
 }
 
+/* Premium hero loading shimmer sweep */
+.hero-shimmer-sweep {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255,255,255,0.012) 35%,
+    rgba(255,255,255,0.028) 50%,
+    rgba(255,255,255,0.012) 65%,
+    transparent 100%
+  );
+  animation: shimmerSweep 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes shimmerSweep {
+  0%   { transform: translateX(-100%) skewX(-8deg); }
+  100% { transform: translateX(250%) skewX(-8deg); }
+}
+
 /* ══════════════════════════════════════════
    DESKTOP / MOBILE NAV VISIBILITY
 ══════════════════════════════════════════ */

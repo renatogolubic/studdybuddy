@@ -142,6 +142,13 @@ export default function UserProfile() {
                   </span>
                 </div>
                 <div>
+                  <p style="font-size:0.7375rem;color:var(--text3);margin:0 0 0.3rem;text-transform:uppercase;letter-spacing:0.06em;">Ukupno bodova</p>
+                  <span class="badge-sb" style="background:var(--warning-dim);color:var(--warning);border:1px solid rgba(251,191,36,0.2);">
+                    <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24" style="margin-right:4px;display:inline-block;vertical-align:-1px;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    {profile().points || 0}
+                  </span>
+                </div>
+                <div>
                   <p style="font-size:0.7375rem;color:var(--text3);margin:0 0 0.5rem;text-transform:uppercase;letter-spacing:0.06em;">Omiljeni predmeti</p>
                   <Show when={profile().favoriteSubjects?.length > 0} fallback={
                     <p style="color:var(--text3);margin:0;font-size:0.875rem;font-style:italic;">Nije odabrano</p>

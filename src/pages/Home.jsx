@@ -36,22 +36,41 @@ function useTypewriter(text, speed = 60, delay = 300) {
 function HeroVideo({ src }) {
   let videoRef;
   let hlsInstance;
+  const [videoReady, setVideoReady] = createSignal(false);
 
   onMount(() => {
     const HLS_CDN = "https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js";
 
     function attachHls() {
       if (window.Hls && window.Hls.isSupported()) {
-        hlsInstance = new window.Hls({ autoStartLoad: true, startLevel: -1 });
+        hlsInstance = new window.Hls({
+          autoStartLoad: true,
+          startLevel: -1,           // let HLS pick the first level based on bandwidth
+          capLevelToPlayerSize: true, // never stream higher res than the element can show
+          maxLoadingDelay: 4,
+          abrBandWidthFactor: 0.9,
+          abrBandWidthUpFactor: 0.5, // conservative upswitch – reduces level thrashing
+        });
         hlsInstance.loadSource(src);
         hlsInstance.attachMedia(videoRef);
-        hlsInstance.on(window.Hls.Events.MANIFEST_PARSED, () => videoRef.play().catch(() => { }));
+        hlsInstance.on(window.Hls.Events.MANIFEST_PARSED, (_, data) => {
+          // Lock to a stable mid-quality level after manifest loads.
+          // This completely disables ABR switching once playback starts.
+          // Level 2 is typically 720p on Mux streams; clamp to max available.
+          const targetLevel = Math.min(2, data.levels.length - 1);
+          hlsInstance.currentLevel = targetLevel;
+          hlsInstance.autoLevelEnabled = false;
+          videoRef.play().catch(() => { });
+        });
       } else if (videoRef.canPlayType("application/vnd.apple.mpegurl")) {
         // Safari native HLS
         videoRef.src = src;
         videoRef.play().catch(() => { });
       }
     }
+
+    // Mark ready once actual playback begins
+    videoRef.addEventListener("playing", () => setVideoReady(true));
 
     if (window.Hls) {
       attachHls();
@@ -68,23 +87,37 @@ function HeroVideo({ src }) {
   });
 
   return (
-    <video
-      ref={videoRef}
-      autoplay
-      muted
-      loop
-      playsinline
-      style={{
-        position: "absolute",
-        inset: 0,
-        width: "100%",
-        height: "100%",
-        "object-fit": "cover",
-        "z-index": 0,
-        opacity: 0.45,
-        "pointer-events": "none",
-      }}
-    />
+    <>
+      {/* ── Premium animated placeholder – visible while HLS loads, fades out when video plays ── */}
+      <div style={`position:absolute;inset:0;z-index:0;pointer-events:none;transition:opacity 1.6s ease;opacity:${videoReady() ? 0 : 1};`}>
+        {/* Large pulsing orbs */}
+        <div style="position:absolute;width:720px;height:720px;border-radius:50%;background:radial-gradient(circle,rgba(124,111,247,0.24),transparent 68%);top:-220px;left:-200px;filter:blur(70px);animation:blobFloat 7s ease-in-out infinite;" />
+        <div style="position:absolute;width:560px;height:560px;border-radius:50%;background:radial-gradient(circle,rgba(34,211,238,0.16),transparent 68%);bottom:-160px;right:-120px;filter:blur(70px);animation:blobFloat 9s ease-in-out infinite reverse;" />
+        <div style="position:absolute;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,0.14),transparent 68%);top:42%;right:18%;filter:blur(60px);animation:blobFloat 11s ease-in-out infinite;" />
+        {/* Shimmer sweep across the hero */}
+        <div class="hero-shimmer-sweep" />
+      </div>
+
+      {/* The actual video — starts invisible, fades in on play */}
+      <video
+        ref={videoRef}
+        autoplay
+        muted
+        loop
+        playsinline
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          "object-fit": "cover",
+          "z-index": 0,
+          opacity: videoReady() ? 0.45 : 0,
+          transition: "opacity 1.6s ease",
+          "pointer-events": "none",
+        }}
+      />
+    </>
   );
 }
 
@@ -206,21 +239,13 @@ export default function Home() {
             {/* CTA buttons */}
             <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;opacity:0;animation:fadeUp 0.6s ease 3.5s forwards;">
               <a href="/user/signup" class="btn-primary" style="padding:0.875rem 2.25rem;font-size:1rem;">
-                Počni besplatno
+                Počni
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
               </a>
               <a href="/notes/search" class="btn-outline" style="padding:0.875rem 2.25rem;font-size:1rem;">Pregledaj bilješke</a>
             </div>
 
-            {/* Stats row */}
-            <div style="display:flex;justify-content:center;gap:2.5rem;margin-top:3.5rem;flex-wrap:wrap;opacity:0;animation:fadeUp 0.6s ease 3.8s forwards;">
-              {[["📚", "Javne bilješke"], ["🎓", "Predmeta"], ["✨", "Besplatno"]].map(([icon, label]) => (
-                <div style="text-align:center;">
-                  <div style="font-size:1.25rem;margin-bottom:0.25rem;">{icon}</div>
-                  <div style="font-size:0.8rem;color:var(--text3);font-weight:500;">{label}</div>
-                </div>
-              ))}
-            </div>
+
           </div>
         </div>
       </Show>
@@ -301,24 +326,32 @@ export default function Home() {
                     <div style="padding:1.25rem;display:flex;flex-direction:column;flex:1;">
                       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem;">
                         <span class="badge-sb badge-subject">{note.subject}</span>
-                        <button
-                          onClick={(e) => handleFavorite(e, note.id)}
-                          style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:4px;padding:4px 6px;border-radius:8px;transition:background 0.15s ease;"
-                          onMouseOver={e => e.currentTarget.style.background = "var(--surface2)"}
-                          onMouseOut={e => e.currentTarget.style.background = "none"}
-                        >
-                          <svg
-                            width="15" height="15"
-                            fill={favorites().includes(note.id) ? "var(--violet-bright)" : "none"}
-                            stroke={favorites().includes(note.id) ? "var(--violet-bright)" : "var(--text3)"}
-                            stroke-width="1.75" viewBox="0 0 24 24"
+                        <div style="display:flex;gap:0.5rem;align-items:center;">
+                          <Show when={note.ratingCount > 0}>
+                            <div style="display:flex;align-items:center;gap:3px;color:var(--warning);">
+                              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                              <span style="font-size:12px;font-weight:600;color:var(--text);">{Number(note.ratingSum / note.ratingCount).toFixed(1)}</span>
+                            </div>
+                          </Show>
+                          <button
+                            onClick={(e) => handleFavorite(e, note.id)}
+                            style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:4px;padding:4px 6px;border-radius:8px;transition:background 0.15s ease;"
+                            onMouseOver={e => e.currentTarget.style.background = "var(--surface2)"}
+                            onMouseOut={e => e.currentTarget.style.background = "none"}
                           >
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                          </svg>
-                          <span style={`font-size:12px;color:${favorites().includes(note.id) ? "var(--violet-bright)" : "var(--text3)"};font-weight:500;`}>
-                            {note.favorites?.length || 0}
-                          </span>
-                        </button>
+                            <svg
+                              width="15" height="15"
+                              fill={favorites().includes(note.id) ? "var(--violet-bright)" : "none"}
+                              stroke={favorites().includes(note.id) ? "var(--violet-bright)" : "var(--text3)"}
+                              stroke-width="1.75" viewBox="0 0 24 24"
+                            >
+                              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                            </svg>
+                            <span style={`font-size:12px;color:${favorites().includes(note.id) ? "var(--violet-bright)" : "var(--text3)"};font-weight:500;`}>
+                              {note.favorites?.length || 0}
+                            </span>
+                          </button>
+                        </div>
                       </div>
                       <h3 style="font-family:var(--font-display);font-size:1.0625rem;font-weight:700;color:var(--text);margin:0 0 0.5rem;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
                         {note.title}
